@@ -4,6 +4,7 @@ import "./globals.css";
 import LightRays from "../components/LightRays";
 import Navbar from "@/components/Navbar";
 import PostHogProvider from "@/components/PostHogProvider";
+import { Suspense } from "react";
 const schibstedGrotesk = Schibsted_Grotesk({
   variable: "--font-schibsted-grotesk",
   subsets: ["latin"],
@@ -44,9 +45,11 @@ export default function RootLayout({
           />
         </div>
 
-        <PostHogProvider>
-          <main>{children}</main>
-        </PostHogProvider>
+        <Suspense>
+          <PostHogProvider>
+            <main>{children}</main>
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );

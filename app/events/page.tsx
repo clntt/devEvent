@@ -1,3 +1,4 @@
+import BookEvent from "@/components/BookEvent";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -40,6 +41,8 @@ const EventTags = ({ tags }: { tags: string[] }) => (
     ))}
   </div>
 );
+
+const bookings = 10;
 
 const EventDetailsPage = async ({
   params,
@@ -120,7 +123,19 @@ const EventDetailsPage = async ({
         </div>
         {/* rightSide Event Content */}
         <aside className="booking">
-          <p className="text-lg font-semibold"> Book Event </p>
+          <div className="signup-card">
+            <h2>Book Your Spot</h2>
+
+            {bookings > 0 ? (
+              <p className="text-sm">
+                Join {bookings} people who havr already booked thier spot.
+              </p>
+            ) : (
+              <p className="text-sm">Be the first to book your spot!</p>
+            )}
+
+            <BookEvent />
+          </div>
         </aside>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { IEvent } from "@/database";
 import { cacheLife } from "next/cache";
+import { getEventBookingCount } from "@/lib/actions/getBookingCount.actions";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -45,20 +46,19 @@ const EventTags = ({ tags }: { tags: string[] }) => (
   </div>
 );
 
-const bookings = 10;
-
 const EventDetailsPage = async ({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) => {
-  "use cache";
-  cacheLife("hours");
+  // "use cache";
+  // cacheLife("hours");
   const { slug } = await params;
   const request = await fetch(`${BASE_URL}/api/events/${slug}`);
   const { event } = await request.json();
 
   if (!event) notFound();
+  const bookings = await getEventBookingCount(event._id.toString());
   const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
 
   return (
@@ -81,7 +81,7 @@ const EventDetailsPage = async ({
 
           <section className="flex-col-gap-2">
             <h2>Overview</h2>
-            <p>{event?.Overview}</p>
+            <p>{event?.overview}</p>
           </section>
 
           <section className="flex-col-gfap-2">
@@ -133,9 +133,12 @@ const EventDetailsPage = async ({
             <h2>Book Your Spot</h2>
 
             {bookings > 0 ? (
-              <p className="text-sm">
-                Join {bookings} people who havr already booked thier spot.
-              </p>
+              <div>
+                <p className="text-sm">
+                  Join {bookings} {bookings > 1 ? "persons" : "person"} who have
+                  already booked thier spot.
+                </p>
+              </div>
             ) : (
               <p className="text-sm">Be the first to book your spot!</p>
             )}
@@ -149,10 +152,29 @@ const EventDetailsPage = async ({
         <h2>Similar Events</h2>
         <div className="events">
           {similarEvents.length > 0 &&
-            similarEvents.map((similarEvent: IEvent) => (
-              <EventCard key={similarEvent?.id} {...similarEvent} />
-            ))}
+            similarEvents.map((similarEvent: IEvent) => {
+              console.log("Similar Event: ", similarEvent.title);
+              return (
+                <EventCard
+                  key={similarEvent?.id}
+                  // {...similarEvent}
+                  image={similarEvent?.image}
+                  date={similarEvent?.date}
+                  slug={similarEvent?.slug}
+                  title={similarEvent?.title}
+                  time={similarEvent?.time}
+                  location={similarEvent?.location}
+                />
+              );
+            })}
         </div>
+
+        {similarEvents.length === 0 && (
+          <p>
+            There are no Similar Events that match your current selection at the
+            moment. Try again!
+          </p>
+        )}
       </div>
     </section>
   );

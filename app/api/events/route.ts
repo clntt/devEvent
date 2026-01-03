@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
     });
 
     event.image = (uploadResult as { secure_url: string }).secure_url;
+
+    // const createdEvent = await Event.create(event);
     const createdEvent = await Event.create({
       ...event,
       tags: tags,
